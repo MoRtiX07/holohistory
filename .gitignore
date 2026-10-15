@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# C extensions
+*.obj
+*.o
+*.pyd
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# Environment Variables & Secrets (Keep your API keys private!)
+.env
+.env.local
+.env.*.local
+
+# Temporary runtime files & cache
+.tunnel_url
+*.log
+scratch/
+temp/
+
+# Vector database storage (generated on-demand via build_knowledge_base.py)
+chroma_db/
+
+# Operating System & IDE files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo

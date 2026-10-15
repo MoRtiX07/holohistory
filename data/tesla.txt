@@ -1,0 +1,69 @@
+Nikola Tesla was born on July 10, 1856, in the village of Smiljan, in what
+was then the Austrian Empire (present-day Croatia), to a Serbian family —
+his father was an Orthodox priest and his mother, though uneducated, was
+known for inventing small household mechanical devices, which Tesla later
+credited as an early influence on his own inventive instincts. He showed
+an unusual memory and vivid visual imagination from childhood, later
+describing an ability to picture inventions in complete, precise detail in
+his mind before ever building them, testing and refining designs mentally
+before touching any physical materials.
+
+He studied engineering at the Austrian Polytechnic in Graz and later
+attended the University of Prague, though he did not complete a formal
+degree. He worked briefly for a telephone company in Budapest, where he
+reportedly conceived the basic principle of the rotating magnetic field —
+later the foundation of his alternating current (AC) induction motor —
+while walking in a park and visualizing the concept fully formed.
+
+In 1884, Tesla emigrated to the United States and briefly worked for
+Thomas Edison's company, but the two disagreed sharply, partly over unpaid
+promised compensation and partly over a deeper technical dispute: Edison
+championed direct current (DC) electrical systems, while Tesla firmly
+believed alternating current was superior for transmitting electricity
+efficiently over long distances. This disagreement escalated into the
+well-known "War of the Currents" during the late 1880s and early 1890s,
+during which Edison's side ran public campaigns to portray AC as dangerous.
+Tesla, backed by industrialist George Westinghouse, ultimately saw AC
+become the dominant standard for electrical power distribution worldwide,
+a system still in use today.
+
+Tesla held over 300 patents across his lifetime and worked on an
+extraordinarily wide range of ideas: the AC induction motor and
+polyphase power system, the Tesla coil (a high-voltage transformer circuit
+still used in radio technology and demonstrations today), early work on
+wireless transmission of information and power, X-ray experimentation, and
+remote-controlled devices — he publicly demonstrated a radio-controlled
+boat in 1898, decades ahead of when such technology became common.
+
+He was known for grand, sometimes unrealized ambitions. His Wardenclyffe
+Tower project, begun in 1901 with funding partly from financier J.P.
+Morgan, aimed to create a system for wireless transmission of both
+information and electrical power across the globe. The project ran out of
+funding before completion and was eventually demolished, marking one of
+the most significant setbacks of his career and contributing to his
+declining fortunes in later decades.
+
+Tesla was famous for his showmanship as well as his engineering — he gave
+dramatic public demonstrations involving high-voltage electricity passing
+harmlessly through his own body to illustrate principles of AC current,
+and he was known to make bold predictions about the future, including
+ideas resembling wireless communication devices, remote sensing, and
+global information networks, decades before such technologies existed in
+practical form.
+
+Personally, Tesla was known for an intensely disciplined and somewhat
+eccentric lifestyle: he never married, believing romantic relationships
+would interfere with his scientific work, kept unusual and precise daily
+routines, and in his later years developed a well-documented fondness for
+feeding and caring for pigeons in New York City, which he described as a
+source of comfort. He held strong opinions about the importance of
+imagination combined with rigorous testing, often stating that an idea
+must be worked out completely in the mind before being built, to avoid
+wasting resources on flawed designs.
+
+Despite his major contributions, Tesla died in relative obscurity and
+financial difficulty on January 7, 1943, in a New York hotel room. His
+reputation and recognition grew substantially in the decades after his
+death, and he is now widely regarded as one of the most important
+inventors and electrical engineers in history, with the SI unit of magnetic
+flux density (the tesla) named in his honor.

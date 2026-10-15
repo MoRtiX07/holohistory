@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Holo Persona — Interactive RAG-grounded historical conversation with Einstein, Kalam, and Tesla.">
+  <title>Holo Persona | Real-Time Historical AI Simulation</title>
+  <!-- Google Fonts: Plus Jakarta Sans, Space Grotesk, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="einstein">
+  <div class="ambient-glow-bg" aria-hidden="true"></div>
+  <div class="subtle-grid-bg" aria-hidden="true"></div>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-logo">
+        <div class="logo-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="brand-title">HOLO PERSONA</span>
+          <div class="brand-meta">
+            <span class="sub-badge" id="mode-badge">RAG CORE v2.5</span>
+            <span class="live-status"><span class="pulse-indicator"></span> ONLINE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <!-- Persona Tabs (Master Mode) -->
+      <nav class="persona-nav" id="persona-nav" aria-label="Historical Personas">
+        <!-- Dynamically rendered via JS -->
+      </nav>
+      <!-- Single Persona Locked Banner (QR Kiosk Mode) -->
+      <div class="kiosk-locked-banner hidden" id="kiosk-banner">
+        <span class="kiosk-indicator"></span>
+        <span class="kiosk-text" id="kiosk-title">EXHIBIT // ALBERT EINSTEIN</span>
+        <span class="kiosk-tag">LOCKED</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <!-- Voice Speed Controls -->
+      <div class="speed-selector" title="Speech Playback Speed">
+        <span class="selector-tag">SPEED</span>
+        <button class="speed-btn" data-speed="0.8">0.8x</button>
+        <button class="speed-btn active" data-speed="1.0">1.0x</button>
+        <button class="speed-btn" data-speed="1.2">1.2x</button>
+      </div>
+
+      <!-- SFX Toggle -->
+      <button id="sfx-toggle-btn" class="header-action-btn" title="Toggle Interface Audio Effects" aria-label="Toggle SFX">
+        <svg class="btn-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span class="btn-text">SFX: ON</span>
+      </button>
+
+      <!-- Voice Toggle -->
+      <button id="tts-toggle-btn" class="header-action-btn" title="Toggle Voice Response" aria-label="Toggle Voice">
+        <svg class="btn-svg" id="tts-icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <span class="btn-text" id="tts-label">Voice: ON</span>
+      </button>
+
+      <!-- Surprise Me / Quantum Warp Button -->
+      <button id="surprise-btn" class="header-action-btn surprise-action-btn" title="Surprise Me: Ask an unexpected historical secret or breakthrough!" aria-label="Surprise Question">
+        <svg class="btn-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        <span class="btn-text">Surprise Me!</span>
+      </button>
+
+      <!-- Works & Artifacts Codex Button -->
+      <button id="artifacts-codex-btn" class="header-action-btn codex-action-btn" title="Explore Life Works, Patents & Blueprints" aria-label="Artifacts Codex">
+        <svg class="btn-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="3" y1="9" x2="21" y2="9"></line>
+          <line x1="9" y1="21" x2="9" y2="9"></line>
+        </svg>
+        <span class="btn-text">Codex</span>
+      </button>
+
+      <!-- QR Badges Button -->
+      <button id="qr-studio-btn" class="header-action-btn qr-action-btn" title="View & Print Visual QR Placards" aria-label="QR Badges">
+        <svg class="btn-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        <span class="btn-text">QR Badges</span>
+      </button>
+
+      <!-- Export Transcript -->
+      <button id="export-chat-btn" class="header-action-btn" title="Export Conversation Log" aria-label="Export Chat">
+        <svg class="btn-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span class="btn-text">Export</span>
+      </button>
+
+      <!-- Fullscreen Button -->
+      <button id="fullscreen-btn" class="header-action-btn icon-only" title="Toggle Fullscreen" aria-label="Fullscreen">
+        <svg class="btn-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <polyline points="9 21 3 21 3 15"></polyline>
+          <line x1="21" y1="3" x2="14" y2="10"></line>
+          <line x1="3" y1="21" x2="10" y2="14"></line>
+        </svg>
+      </button>
+
+      <!-- RAG Memory Button -->
+      <button id="memory-toggle-btn" class="header-action-btn memory-action-btn" title="Inspect Retrieved ChromaDB Text Chunks" aria-label="RAG Memory">
+        <svg class="btn-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span class="btn-text">RAG Memory</span>
+        <span class="count-pill" id="chunk-count-badge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewport Layout -->
+  <main class="main-layout">
+    <!-- Left Stage: Hologram Projection Chamber -->
+    <section class="hologram-stage" aria-label="Active Holographic Projection">
+      <div class="stage-card">
+        <div class="stage-topbar">
+          <div class="feed-status">
+            <span class="feed-dot"></span>
+            <span class="feed-label" id="holo-status">TRANSMITTING ACTIVE</span>
+          </div>
+          <span class="era-badge" id="holo-era">1879 - 1955</span>
+        </div>
+
+        <!-- Projection Emitter Stage with Large Animated Portrait -->
+        <div class="emitter-view large-holo-stage" id="large-holo-stage">
+          <!-- Ambient Floating Holographic Inventions of their Works -->
+          <div class="floating-artifacts-layer" id="floating-artifacts-layer" aria-label="Floating Invention Artifacts">
+            <!-- Dynamically populated via JS -->
+          </div>
+
+          <!-- Top Stage Holographic Projector Bar -->
+          <div class="stage-projector-bar top-projector">
+            <div class="emitter-node"></div>
+            <div class="emitter-node main"></div>
+            <div class="emitter-node"></div>
+            <div class="projector-glow-cone"></div>
+          </div>
+
+          <!-- Grand Hologram Portrait Chamber -->
+          <div class="grand-portrait-container" id="grand-portrait-container">
+            <div class="halo-effect grand-halo" id="avatar-glow"></div>
+            <!-- Quantum Warp Flare FX -->
+            <div class="quantum-warp-flare hidden" id="warp-flare" aria-hidden="true"></div>
+
+            <!-- Grand Avatar Wrapper with Large Full Portrait & Breathing Animation -->
+            <div class="persona-avatar-wrapper grand-portrait-wrapper" id="persona-avatar-wrapper">
+              <img id="avatar-photo" class="avatar-photo-img grand-portrait-img" src="/images/einstein_large.jpg" alt="Historical Portrait" />
+              
+              <!-- Holographic Visual Atmosphere Layers -->
+              <div class="holo-scan-sweep"></div>
+              <div class="holo-cyber-grid"></div>
+              <div class="holo-edge-vignette"></div>
+              
+              <!-- Hologram Tech Brackets & HUD -->
+              <div class="holo-hud-brackets">
+                <span class="hud-corner tl"></span>
+                <span class="hud-corner tr"></span>
+                <span class="hud-corner bl"></span>
+                <span class="hud-corner br"></span>
+              </div>
+              <div class="holo-hud-tag">
+                <span class="pulse-dot"></span>
+                <span id="holo-hud-code">HISTORICAL PROJECTION // 1080p</span>
+              </div>
+            </div>
+
+            <!-- Audio Reactive Resonance Rings for Speech -->
+            <div class="audio-reactive-ring grand-ring" id="audio-ring"></div>
+            <div class="audio-resonance-aura" id="audio-aura"></div>
+          </div>
+
+          <!-- Floating Voice Stop Button -->
+          <button id="stop-speaking-btn" class="stop-voice-pill hidden" title="Stop Voice Playback">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+            </svg>
+            <span>Stop Voice</span>
+          </button>
+
+          <!-- Grand Holographic Pedestal Emitter -->
+          <div class="emitter-base grand-pedestal">
+            <div class="pedestal-disc"></div>
+            <div class="pedestal-rings"></div>
+            <div class="pedestal-glow"></div>
+          </div>
+        </div>
+
+        <!-- Persona Dossier Info -->
+        <div class="persona-dossier">
+          <div class="dossier-header-row">
+            <h2 class="persona-name" id="dossier-name">Albert Einstein</h2>
+            <span class="grounded-tag">GROUNDED RAG</span>
+          </div>
+          <p class="persona-title" id="dossier-title">Theoretical Physicist & Nobel Laureate</p>
+          
+          <div class="persona-quote-box">
+            <span class="quote-sign">“</span>
+            <p class="persona-quote-text" id="dossier-quote">Imagination is more important than knowledge.</p>
+          </div>
+          
+          <div class="dossier-stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">SOURCE ARCHIVE</span>
+              <span class="stat-val highlight" id="dossier-words">4,558 words</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">VECTOR EMBEDDING</span>
+              <span class="stat-val">all-MiniLM-L6</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">LLM ENGINE</span>
+              <span class="stat-val">Gemini 3.1 Flash</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Milestones Track -->
+        <div class="timeline-section">
+          <span class="section-micro-label">HISTORICAL MILESTONES (CLICK TO ASK)</span>
+          <div class="milestones-track" id="milestones-track">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Waveform Audio Equalizer -->
+        <div class="audio-waveform" id="waveform-container" aria-label="Audio Visualizer">
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+          <div class="wave-col"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Stage: Live Conversational Interface -->
+    <section class="chat-console-stage" aria-label="Conversation Console">
+      <div class="console-card">
+        <!-- Console Top Info -->
+        <div class="console-topbar">
+          <div class="channel-info">
+            <span class="channel-indicator"></span>
+            <span>CHANNEL // <strong id="channel-name">EINSTEIN_DIRECT</strong></span>
+          </div>
+          <button id="clear-chat-btn" class="clear-action-btn" title="Clear conversation history">Clear History</button>
+        </div>
+
+        <!-- Category Topic Filter Pills -->
+        <div class="category-tabs-bar" id="category-filter-bar" aria-label="Topic categories">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <!-- Messages Viewport -->
+        <div class="messages-flow" id="messages-container" role="log" aria-live="polite">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Topic Prompts Scroller -->
+        <div class="prompts-bar" id="prompts-container" aria-label="Suggested questions">
+          <span class="prompts-tag">PROMPTS:</span>
+          <!-- Dynamic prompt chips -->
+        </div>
+
+        <!-- Input Console -->
+        <div class="input-dock">
+          <form id="chat-form" class="chat-form" onsubmit="return false;">
+            <div class="input-shell">
+              <textarea 
+                id="user-input" 
+                rows="1" 
+                placeholder="Ask Albert Einstein about relativity, his childhood, peace..." 
+                aria-label="Your message to the persona"
+                maxlength="600"
+              ></textarea>
+              
+              <div class="dock-actions">
+                <button type="button" id="mic-btn" class="dock-btn mic-btn" title="Dictate question" aria-label="Dictate message">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                  </svg>
+                </button>
+                <button type="submit" id="send-btn" class="transmit-btn" aria-label="Transmit Question">
+                  <span>Transmit</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </form>
+          <div class="dock-footnote">
+            <span>RAG Grounded Historical Simulation &bull; Enter to send, Shift+Enter for new line</span>
+            <span class="rec-active-tag hidden" id="rec-status">Listening...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Grounded Context Inspector Drawer -->
+  <div class="drawer-scrim hidden" id="drawer-backdrop"></div>
+  <aside class="context-drawer hidden" id="context-drawer" aria-label="Retrieved ChromaDB Context">
+    <div class="drawer-top">
+      <div class="drawer-title-wrap">
+        <h3>Grounded Knowledge Chunks</h3>
+        <p>Exact ChromaDB vector passages retrieved for the latest response</p>
+      </div>
+      <button id="close-drawer-btn" class="drawer-close-btn" aria-label="Close Inspector">&times;</button>
+    </div>
+    
+    <div class="drawer-body" id="drawer-content">
+      <div class="empty-state-notice">
+        <p>No queries transmitted yet in this session.</p>
+        <span>Ask a question to see the exact reference text chunks retrieved from ChromaDB!</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Access Gate Modal (For Direct Webpage Visitors) -->
+  <div class="modal-scrim hidden" id="access-gate-modal">
+    <div class="gate-card">
+      <div class="gate-header">
+        <div class="gate-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h2>Holo Persona Access Gate</h2>
+        <p>Select a dedicated exhibit station below or enter the Operator Passcode to unlock the full multi-persona console and QR studio.</p>
+      </div>
+
+      <!-- Quick Single Persona Stations -->
+      <div class="gate-group">
+        <span class="gate-group-label">QUICK EXHIBIT STATIONS (1 PERSONA)</span>
+        <div class="gate-cards-row">
+          <button class="gate-choice-card" onclick="launchSingleKiosk('einstein')">
+            <img src="/images/einstein_avatar.jpg" alt="Einstein" />
+            <div class="choice-text">
+              <strong>Albert Einstein</strong>
+              <span>Theoretical Physics</span>
+            </div>
+          </button>
+          <button class="gate-choice-card" onclick="launchSingleKiosk('kalam')">
+            <img src="/images/kalam_avatar.jpg" alt="Kalam" />
+            <div class="choice-text">
+              <strong>Dr. A.P.J. Abdul Kalam</strong>
+              <span>Aerospace & Vision</span>
+            </div>
+          </button>
+          <button class="gate-choice-card" onclick="launchSingleKiosk('tesla')">
+            <img src="/images/tesla_avatar.jpg" alt="Tesla" />
+            <div class="choice-text">
+              <strong>Nikola Tesla</strong>
+              <span>Electrical Science</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="gate-or-separator">
+        <span>OR</span>
+      </div>
+
+      <!-- Master Operator PIN Gate -->
+      <div class="gate-group">
+        <span class="gate-group-label">MASTER OPERATOR ACCESS (ALL PERSONAS)</span>
+        <div class="pin-entry-row">
+          <input type="password" id="operator-pin-input" placeholder="Enter PIN (Default: 1879)" maxlength="10" />
+          <button id="verify-pin-btn" class="transmit-btn">Unlock Console</button>
+        </div>
+        <p class="pin-err-label" id="pin-error-msg"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual QR Badges Studio Modal -->
+  <div class="modal-scrim hidden" id="qr-studio-modal">
+    <div class="studio-card">
+      <div class="studio-top">
+        <div>
+          <h2>Exhibit QR Placards & Standees</h2>
+          <p>Each QR code displays the person's real photograph. Scanning opens directly into that <strong>single persona</strong> on mobile phones.</p>
+        </div>
+        <div class="studio-actions">
+          <button class="print-action-btn" onclick="window.print()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>Print Cards</span>
+          </button>
+          <button class="drawer-close-btn" id="close-qr-modal-btn">&times;</button>
+        </div>
+      </div>
+
+      <!-- Network Target Selector (Fixes "localhost refused to connect" on phones) -->
+      <div class="studio-network-bar">
+        <div class="net-info-left">
+          <span class="net-pill-label">PHONE TARGET ROUTE:</span>
+          <div class="net-toggle-group">
+            <button id="net-mode-tunnel" class="net-mode-btn active" title="Accessible from ANY phone anywhere via Cloudflare">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>Public Tunnel (Any Phone)</span>
+            </button>
+            <button id="net-mode-lan" class="net-mode-btn" title="Accessible when phone is connected to the same Wi-Fi">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+              <span id="lan-btn-text">Local Wi-Fi Network</span>
+            </button>
+          </div>
+        </div>
+        <div class="net-active-domain">
+          <span>Target URL:</span>
+          <code id="active-target-url-text">https://plot-waiting-underlying-fill.trycloudflare.com</code>
+        </div>
+      </div>
+
+      <div class="placards-grid" id="qr-cards-container">
+        <!-- Dynamically rendered via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Historical Artifacts & Works Codex Modal -->
+  <div class="modal-scrim hidden" id="artifacts-codex-modal">
+    <div class="codex-card">
+      <div class="studio-top">
+        <div>
+          <h2 id="codex-modal-title">Historical Artifacts & Life Works</h2>
+          <p id="codex-modal-subtitle">Original blueprints, technical schematics, and discoveries. Click any artifact to ask the persona directly.</p>
+        </div>
+        <div class="studio-actions">
+          <button class="drawer-close-btn" id="close-codex-modal-btn">&times;</button>
+        </div>
+      </div>
+
+      <div class="codex-grid" id="codex-grid-container">
+        <!-- Dynamically populated via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-bubble hidden" id="toast-msg"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
