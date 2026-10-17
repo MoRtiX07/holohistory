@@ -434,8 +434,40 @@ def chunk_text(text: str, chunk_size: int = 500, overlap: int = 100):
     return overlapped
 
 
+STOP_WORDS = {
+    'what', 'when', 'where', 'which', 'who', 'whom', 'whose', 'why', 'how',
+    'your', 'you', 'about', 'did', 'tell', 'explain', 'describe', 'were', 'was',
+    'are', 'is', 'the', 'and', 'that', 'this', 'for', 'with', 'from', 'have',
+    'had', 'has', 'not', 'but', 'can', 'could', 'would', 'should', 'all', 'any'
+}
+
+
+def _score_chunk(chunk: str, question: str) -> float:
+    c_low = chunk.lower()
+    q_low = question.lower()
+    clean_q = re.sub(r'[^\w\s]', ' ', q_low).strip()
+    words = [w for w in clean_q.split() if w not in STOP_WORDS and len(w) > 1]
+    
+    score = 0.0
+    if len(clean_q) > 4 and clean_q in c_low:
+        score += 25.0
+        
+    q_words = clean_q.split()
+    for i in range(len(q_words) - 1):
+        bigram = f"{q_words[i]} {q_words[i+1]}"
+        if bigram in c_low and not all(w in STOP_WORDS for w in bigram.split()):
+            score += 10.0
+            
+    for w in words:
+        if w in c_low:
+            tf = min(c_low.count(w), 4)
+            score += tf * (4.0 if len(w) > 4 else 2.0)
+            
+    return score
+
+
 def retrieve_fallback_context(persona_name: str, question: str, k: int = TOP_K):
-    """Direct in-memory knowledge retrieval from data/{persona_name}.txt without requiring ChromaDB."""
+    """Direct in-memory knowledge retrieval with high-precision scoring matching ChromaDB."""
     persona_file = os.path.join(DATA_DIR, f"{persona_name}.txt")
     if not os.path.isfile(persona_file):
         return "(no relevant context found)", []
@@ -446,13 +478,7 @@ def retrieve_fallback_context(persona_name: str, question: str, k: int = TOP_K):
         if not chunks:
             return "(no relevant context found)", []
         
-        words = [w for w in re.findall(r"\w+", question.lower()) if len(w) > 2]
-        scored = []
-        for c in chunks:
-            c_lower = c.lower()
-            score = sum(1 for w in words if w in c_lower)
-            scored.append((score, c))
-        scored.sort(key=lambda x: x[0], reverse=True)
+        scored = sorted([(_score_chunk(c, question), c) for c in chunks], key=lambda x: x[0], reverse=True)
         top_chunks = [c for _, c in scored[:k]]
         return "\n\n---\n\n".join(top_chunks), top_chunks
     except Exception as e:
@@ -574,9 +600,22 @@ def list_personas():
 
 
 @app.get("/api/network-info")
-def get_network_info():
+def get_network_info(request: Request):
     local_ip = get_local_ip()
     tunnel_url = get_tunnel_url()
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or ""
+    scheme = request.headers.get("x-forwarded-proto") or request.url.scheme or "http"
+
+    # Cloud / Vercel deployment detection
+    if host and "localhost" not in host and "127.0.0.1" not in host and not host.startswith("192.168."):
+        cloud_url = f"{scheme}://{host}"
+        return {
+            "local_ip": local_ip,
+            "local_url": cloud_url,
+            "tunnel_url": cloud_url,
+            "recommended": cloud_url
+        }
+
     return {
         "local_ip": local_ip,
         "local_url": f"http://{local_ip}:8000",
