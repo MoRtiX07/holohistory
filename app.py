@@ -37,8 +37,19 @@ except ImportError:
 # Configurations
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
+if not os.path.isdir(DATA_DIR):
+    for candidate in [os.path.join(os.getcwd(), "data"), os.path.join(os.path.dirname(BASE_DIR), "data")]:
+        if os.path.isdir(candidate):
+            DATA_DIR = candidate
+            break
+
 DB_DIR = os.path.join(BASE_DIR, "chroma_db")
 IMAGES_DIR = os.path.join(BASE_DIR, "static", "images")
+if not os.path.isdir(IMAGES_DIR):
+    for candidate in [os.path.join(os.getcwd(), "static", "images"), os.path.join(os.path.dirname(BASE_DIR), "static", "images")]:
+        if os.path.isdir(candidate):
+            IMAGES_DIR = candidate
+            break
 os.makedirs(IMAGES_DIR, exist_ok=True)
 TOP_K = 3
 MASTER_PIN = "1879"  # Year Einstein was born
@@ -74,19 +85,7 @@ def get_tunnel_url():
         except Exception:
             pass
 
-    # 3. Search recent cloudflared logs in antigravity IDE brain directory
-    try:
-        home = os.path.expanduser("~")
-        pattern = os.path.join(home, ".gemini", "antigravity-ide", "brain", "*", ".system_generated", "tasks", "task-*.log")
-        logs = glob.glob(pattern)
-        for log_path in sorted(logs, key=os.path.getmtime, reverse=True)[:5]:
-            with open(log_path, "r", encoding="utf-8", errors="ignore") as f:
-                content = f.read()
-                m = re.search(r"https://[a-zA-Z0-9-]+\.trycloudflare\.com", content)
-                if m:
-                    return m.group(0)
-    except Exception:
-        pass
+    # 3. No active tunnel found
 
     return None
 
