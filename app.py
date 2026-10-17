@@ -438,30 +438,41 @@ STOP_WORDS = {
     'what', 'when', 'where', 'which', 'who', 'whom', 'whose', 'why', 'how',
     'your', 'you', 'about', 'did', 'tell', 'explain', 'describe', 'were', 'was',
     'are', 'is', 'the', 'and', 'that', 'this', 'for', 'with', 'from', 'have',
-    'had', 'has', 'not', 'but', 'can', 'could', 'would', 'should', 'all', 'any'
+    'had', 'has', 'not', 'but', 'can', 'could', 'would', 'should', 'all', 'any',
+    'like', 'such', 'into', 'some', 'more', 'most', 'been', 'being', 'their', 'them',
+    'they', 'there', 'here', 'than', 'then', 'also', 'just', 'well', 'much', 'many',
+    'does', 'do', 'doing', 'give', 'me', 'my', 'his', 'her', 'our'
 }
+
+
+def _stem_word(word: str) -> str:
+    for suffix in ('hood', 'ing', 'tion', 'ness', 'ment', 'ies', 'es', 's', 'ed', 'ly', 'al', 'ic', 'ity'):
+        if len(word) > len(suffix) + 3 and word.endswith(suffix):
+            return word[:-len(suffix)]
+    return word
 
 
 def _score_chunk(chunk: str, question: str) -> float:
     c_low = chunk.lower()
     q_low = question.lower()
     clean_q = re.sub(r'[^\w\s]', ' ', q_low).strip()
-    words = [w for w in clean_q.split() if w not in STOP_WORDS and len(w) > 1]
+    words = [w for w in clean_q.split() if w not in STOP_WORDS and len(w) > 2]
     
     score = 0.0
     if len(clean_q) > 4 and clean_q in c_low:
-        score += 25.0
+        score += 50.0
         
-    q_words = clean_q.split()
-    for i in range(len(q_words) - 1):
-        bigram = f"{q_words[i]} {q_words[i+1]}"
-        if bigram in c_low and not all(w in STOP_WORDS for w in bigram.split()):
-            score += 10.0
-            
+    c_words = [re.sub(r'[^\w]', '', w) for w in c_low.split()]
+    c_stems = [_stem_word(w) for w in c_words if len(w) > 2]
+    
     for w in words:
-        if w in c_low:
-            tf = min(c_low.count(w), 4)
-            score += tf * (4.0 if len(w) > 4 else 2.0)
+        w_stem = _stem_word(w)
+        if w in c_words:
+            score += 10.0 * min(c_words.count(w), 5)
+        elif w_stem in c_stems:
+            score += 8.0 * min(c_stems.count(w_stem), 5)
+        elif len(w_stem) >= 4 and any(w_stem in s or s in w_stem for s in c_stems):
+            score += 4.0
             
     return score
 
@@ -713,14 +724,8 @@ def chat_with_persona(req: ChatRequest):
         raise HTTPException(status_code=400, detail="Question cannot be empty")
 
     meta = PERSONA_METADATA[persona_id]
-    collection = get_collection(persona_id)
-    if collection is not None:
-        try:
-            formatted_context, chunks = retrieve_context_with_chunks(collection, question, k=TOP_K)
-        except Exception:
-            formatted_context, chunks = retrieve_fallback_context(persona_id, question, k=TOP_K)
-    else:
-        formatted_context, chunks = retrieve_fallback_context(persona_id, question, k=TOP_K)
+    # Direct high-precision text retrieval ensures 100% identical context on Localhost and Vercel
+    formatted_context, chunks = retrieve_fallback_context(persona_id, question, k=TOP_K)
     
     system_prompt = PERSONA_SYSTEM_TEMPLATE.format(
         name=meta["name"],
@@ -732,11 +737,12 @@ def chat_with_persona(req: ChatRequest):
     answer = None
     last_error = None
     models_to_try = [
-        "gemini-3.8-flash",
-        "gemini-3-flash-preview",
+        "gemini-3.1-flash-lite",
         "gemini-3.1-flash-lite-preview",
+        "gemini-3.5-flash-lite",
+        "gemini-flash-lite-latest",
         "gemini-flash-latest",
-        "gemini-2.0-flash",
+        "gemini-3.8-flash",
     ]
 
     for model_name in models_to_try:
